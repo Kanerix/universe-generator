@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::player::Player;
+use crate::spaceship::Spaceship;
 
 #[derive(Component)]
 pub struct Camera;
@@ -10,8 +10,8 @@ pub fn setup_camera(mut commands: Commands) {
 }
 
 pub fn camera_player_lock(
-	mut camera_query: Query<&mut Transform, (With<Camera>, Without<Player>)>,
-	player_query: Query<&mut Transform, (With<Player>, Without<Camera>)>,
+	mut camera_query: Query<&mut Transform, (With<Camera>, Without<Spaceship>)>,
+	player_query: Query<&mut Transform, (With<Spaceship>, Without<Camera>)>,
 	time: Res<Time>,
 ) {
 	let player_transform = player_query.single();

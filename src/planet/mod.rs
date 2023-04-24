@@ -1,19 +1,28 @@
-mod earth;
-
-use bevy::prelude::*;
-
-use crate::animate::{AnimationIndices, AnimationTimer};
-
-pub trait PlanetAnimations {
-	fn spin();
-}
+use crate::animate::{Animate, AnimationIndices, AnimationTimer};
+use bevy::{prelude::*, window::PrimaryWindow};
 
 #[derive(Component)]
-pub struct Planet {
-	name: String,
+pub struct Planet;
+
+impl Animate for Planet {
+	fn animate(
+		mut sprite: &mut TextureAtlasSprite,
+		indices: &AnimationIndices,
+		timer: &mut AnimationTimer,
+		time: &Time,
+	) {
+		timer.tick(time.delta());
+		if timer.just_finished() {
+			sprite.index = if sprite.index == indices.last {
+				indices.first
+			} else {
+				sprite.index + 1
+			}
+		}
+	}
 }
 
-pub fn spawn_planet(
+pub fn render_planets(
 	mut commands: Commands,
 	mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 	asset_server: ResMut<AssetServer>,
@@ -27,36 +36,27 @@ pub fn spawn_planet(
 			SpriteSheetBundle {
 				texture_atlas: texture_atlas_handle,
 				sprite: TextureAtlasSprite::new(0),
-				transform: Transform::from_scale(Vec3::splat(5.)),
+				transform: Transform::from_xyz(200., 200., 0.),
 				..default()
 			},
 			AnimationIndices { first: 0, last: 49 },
 			AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
 		))
-		.insert(Planet {
-			name: "Earth".to_string(),
-		});
+		.insert(Planet);
 }
 
 pub fn animate_planets(
 	mut planets_query: Query<
 		(
+			&mut TextureAtlasSprite,
 			&AnimationIndices,
 			&mut AnimationTimer,
-			&mut TextureAtlasSprite,
 		),
 		With<Planet>,
 	>,
 	time: Res<Time>,
 ) {
-	for (indices, mut timer, mut sprite) in planets_query.iter_mut() {
-		timer.tick(time.delta());
-		if timer.just_finished() {
-			sprite.index = if sprite.index == indices.last {
-				indices.first
-			} else {
-				sprite.index + 1
-			}
-		}
+	for (mut sprite, indices, mut timer) in planets_query.iter_mut() {
+		Planet::animate(&mut sprite, &indices, &mut timer, &time)
 	}
 }

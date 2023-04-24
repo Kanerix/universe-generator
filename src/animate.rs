@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::prelude::{Component, Deref, DerefMut, TextureAtlasSprite, Time, Timer};
 
 #[derive(Component)]
 pub struct AnimationIndices {
@@ -8,3 +8,12 @@ pub struct AnimationIndices {
 
 #[derive(Component, Deref, DerefMut)]
 pub struct AnimationTimer(pub Timer);
+
+pub trait Animate {
+	fn animate(
+		sprite: &mut TextureAtlasSprite,
+		animation_indices: &AnimationIndices,
+		animation_timer: &mut AnimationTimer,
+		time: &Time,
+	);
+}
