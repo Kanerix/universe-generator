@@ -1,7 +1,8 @@
 use bevy::prelude::*;
+use bevy_egui::{egui, EguiContexts};
 
 const MAX_ALLOWED_SPEED: f32 = 400.;
-const MIN_ALLOWED_SPEED: f32 = 15.;
+const MIN_ALLOWED_SPEED: f32 = 0.;
 
 #[derive(Component)]
 pub struct Spaceship {
@@ -26,14 +27,14 @@ pub fn setup_spaceship(mut commands: Commands, asset_server: ResMut<AssetServer>
 	commands.spawn((
 		SpriteBundle {
 			texture: asset_server.load("spaceship.png"),
-			transform: Transform::default(),
+			transform: Transform::from_xyz(0., 0., 1.),
 			..default()
 		},
 		Spaceship { ..default() },
 	));
 }
 
-pub fn player_movement_system(
+pub fn player_movement(
 	mut player_query: Query<(&mut Transform, &mut Spaceship), With<Spaceship>>,
 	input: Res<Input<KeyCode>>,
 	time: Res<Time>,
@@ -76,4 +77,19 @@ pub fn player_movement_system(
 
 	let velocity = transform.up();
 	transform.translation += velocity * spaceship.speed * delta_seconds;
+}
+
+pub fn player_debug(
+	mut contexts: EguiContexts,
+	mut player_query: Query<(&mut Transform, &mut Spaceship), With<Spaceship>>,
+) {
+	let Ok(player) = player_query.get_single_mut() else {
+		return;
+	};
+
+	egui::Window::new("Player").show(contexts.ctx_mut(), |ui| {
+		ui.label("Position");
+		ui.label(format!("X: {}", player.0.translation.x));
+		ui.label(format!("Y: {}", player.0.translation.y));
+	});
 }
