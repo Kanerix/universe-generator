@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
 	animate::{Animate, AnimationIndices, AnimationTimer},
-	chunks::Chunk,
+	tile::Tile,
 };
 
 #[derive(Component)]
@@ -28,11 +28,11 @@ impl Animate for Planet {
 
 pub fn render_planets(
 	mut commands: Commands,
-	chunks_query: Query<Entity, With<Chunk>>,
+	tile_query: Query<Entity, (With<Tile>, Without<Planet>)>,
 	mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 	asset_server: ResMut<AssetServer>,
 ) {
-	for entity in chunks_query.iter() {
+	for entity in tile_query.iter() {
 		let img_handle = asset_server.load("planets/earth.png");
 		let texture_atlas =
 			TextureAtlas::from_grid(img_handle, Vec2::splat(100.), 50, 1, None, None);
@@ -49,7 +49,7 @@ pub fn render_planets(
 						..default()
 					},
 					AnimationIndices { first: 0, last: 49 },
-					AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
+					AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
 				));
 			})
 			.insert(Planet);

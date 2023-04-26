@@ -1,15 +1,15 @@
 mod animate;
 mod camera;
-mod chunks;
-mod planet;
+mod planets;
 mod spaceship;
+mod tile;
 
 use bevy::{prelude::*, window::WindowMode};
 use bevy_egui::EguiPlugin;
 use camera::{camera_player_lock, setup_camera};
-use chunks::{render_chunks, culling_system};
-use planet::{animate_planets, render_planets};
+use planets::{animate_planets, render_planets};
 use spaceship::{player_debug, player_movement, setup_spaceship};
+use tile::TilePlugin;
 
 fn main() {
 	let _app = App::new()
@@ -27,10 +27,9 @@ fn main() {
 				}),
 		)
 		.add_plugin(EguiPlugin)
+		.add_plugin(TilePlugin)
 		.add_startup_system(setup_camera)
 		.add_startup_system(setup_spaceship)
-		.add_system(render_chunks)
-		.add_system(culling_system)
 		.add_system(render_planets)
 		.add_system(animate_planets)
 		.add_system(player_movement)
