@@ -1,8 +1,10 @@
 use bevy::prelude::*;
+use rand::{SeedableRng, Rng};
+use rand_chacha::ChaCha20Rng;
 
 use crate::{
 	animate::{Animate, AnimationIndices, AnimationTimer},
-	tile::Tile,
+	tile::Tile
 };
 
 #[derive(Component)]
@@ -28,29 +30,37 @@ impl Animate for Planet {
 
 pub fn render_planets(
 	mut commands: Commands,
-	tile_query: Query<Entity, (With<Tile>, Without<Planet>)>,
+	tile_query: Query<(Entity, &Tile), (With<Tile>, Without<Planet>)>,
 	mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 	asset_server: ResMut<AssetServer>,
 ) {
-	for entity in tile_query.iter() {
+	for (entity, tile) in tile_query.iter() {
 		let img_handle = asset_server.load("planets/earth.png");
 		let texture_atlas =
 			TextureAtlas::from_grid(img_handle, Vec2::splat(100.), 50, 1, None, None);
 		let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
+	    let mut rng = ChaCha20Rng::seed_from_u64(
+			(((tile.x + tile.y) * (tile.x + tile.y + 1) / 2) + tile.y) as u64
+		);
+
+		let has_planet = rng.gen_bool(0.1);
+
 		commands
 			.entity(entity)
 			.with_children(|builder| {
-				builder.spawn((
-					SpriteSheetBundle {
-						texture_atlas: texture_atlas_handle,
-						sprite: TextureAtlasSprite::new(0),
-						transform: Transform::from_xyz(0., 0., 0.5),
-						..default()
-					},
-					AnimationIndices { first: 0, last: 49 },
-					AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-				));
+				if has_planet {
+					builder.spawn((
+						SpriteSheetBundle {
+							texture_atlas: texture_atlas_handle,
+							sprite: TextureAtlasSprite::new(0),
+							transform: Transform::from_xyz(0., 0., 0.5),
+							..default()
+						},
+						AnimationIndices { first: 0, last: 49 },
+						AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+					));
+				}
 			})
 			.insert(Planet);
 	}
