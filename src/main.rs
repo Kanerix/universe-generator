@@ -8,7 +8,7 @@ use bevy::{prelude::*, window::WindowMode};
 use bevy_egui::EguiPlugin;
 use camera::{camera_player_lock, setup_camera};
 use planets::{animate_planets, render_planets};
-use spaceship::{player_debug, player_movement, setup_spaceship};
+use spaceship::{spaceship_debug, spaceship_movement, setup_spaceship};
 use tile::TilePlugin;
 
 fn main() {
@@ -32,8 +32,8 @@ fn main() {
 		.add_startup_system(setup_spaceship)
 		.add_system(render_planets)
 		.add_system(animate_planets)
-		.add_system(player_movement)
-		.add_system(player_debug)
+		.add_system(spaceship_movement)
+		.add_system(spaceship_debug)
 		.add_system(camera_player_lock)
 		.run();
 }

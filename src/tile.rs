@@ -3,7 +3,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use crate::spaceship::Spaceship;
 
 const TILE_SIZE: f32 = 150.;
-const EXTRA_TILES_AMOUNT: f32 = 2.;
+const EXTRA_TILES: f32 = 2.;
 
 #[derive(Component)]
 pub struct Tile {
@@ -35,8 +35,8 @@ pub fn render_tiles(
 
 	let x_tile_offset: i32 = f32::round(spaceship_transform.translation.x / TILE_SIZE) as i32;
 	let y_tile_offset: i32 = f32::round(spaceship_transform.translation.y / TILE_SIZE) as i32;
-	let x_tiles_amount = f32::ceil(primary_window.width() / TILE_SIZE + EXTRA_TILES_AMOUNT);
-	let y_tiles_amount = f32::ceil(primary_window.height() / TILE_SIZE + EXTRA_TILES_AMOUNT);
+	let x_tiles_amount = f32::ceil(primary_window.width() / TILE_SIZE + EXTRA_TILES);
+	let y_tiles_amount = f32::ceil(primary_window.height() / TILE_SIZE + EXTRA_TILES);
 
 	for x in x_tile_offset..x_tiles_amount as i32 + x_tile_offset {
 		for y in y_tile_offset..y_tiles_amount as i32 + y_tile_offset {
@@ -81,8 +81,8 @@ pub fn cleanup_tiles(
 
 	let x_tile_offset: i32 = f32::round(spaceship_transform.translation.x / TILE_SIZE) as i32;
 	let y_tile_offset: i32 = f32::round(spaceship_transform.translation.y / TILE_SIZE) as i32;
-	let x_tiles_amount = f32::ceil(primary_window.width() / TILE_SIZE + EXTRA_TILES_AMOUNT);
-	let y_tiles_amount = f32::ceil(primary_window.height() / TILE_SIZE + EXTRA_TILES_AMOUNT);
+	let x_tiles_amount = f32::ceil(primary_window.width() / TILE_SIZE + EXTRA_TILES);
+	let y_tiles_amount = f32::ceil(primary_window.height() / TILE_SIZE + EXTRA_TILES);
 
 	for (tile_entity, tile) in tiles_query.iter() {
 		if (tile.x < x_tile_offset - 1 || tile.x > x_tile_offset + x_tiles_amount as i32 + 1)
