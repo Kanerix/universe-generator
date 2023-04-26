@@ -7,7 +7,7 @@ mod spaceship;
 use bevy::{prelude::*, window::WindowMode};
 use bevy_egui::EguiPlugin;
 use camera::{camera_player_lock, setup_camera};
-use chunks::render_chunks;
+use chunks::{render_chunks, culling_system};
 use planet::{animate_planets, render_planets};
 use spaceship::{player_debug, player_movement, setup_spaceship};
 
@@ -30,6 +30,7 @@ fn main() {
 		.add_startup_system(setup_camera)
 		.add_startup_system(setup_spaceship)
 		.add_system(render_chunks)
+		.add_system(culling_system)
 		.add_system(render_planets)
 		.add_system(animate_planets)
 		.add_system(player_movement)

@@ -28,7 +28,7 @@ impl Animate for Planet {
 
 pub fn render_planets(
 	mut commands: Commands,
-	chunks_query: Query<Entity, (With<Chunk>, Without<Planet>)>,
+	chunks_query: Query<Entity, With<Chunk>>,
 	mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 	asset_server: ResMut<AssetServer>,
 ) {
@@ -38,34 +38,39 @@ pub fn render_planets(
 			TextureAtlas::from_grid(img_handle, Vec2::splat(100.), 50, 1, None, None);
 		let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-		commands.entity(entity).with_children(|parent| {
-			parent.spawn((
-				SpriteSheetBundle {
-					texture_atlas: texture_atlas_handle,
-					sprite: TextureAtlasSprite::new(0),
-					transform: Transform::from_xyz(200., 200., 0.5),
-					..default()
-				},
-				AnimationIndices { first: 0, last: 49 },
-				AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-				Planet,
-			));
-		});
+		commands
+			.entity(entity)
+			.with_children(|builder| {
+				builder.spawn((
+					SpriteSheetBundle {
+						texture_atlas: texture_atlas_handle,
+						sprite: TextureAtlasSprite::new(0),
+						transform: Transform::from_xyz(0., 0., 0.5),
+						..default()
+					},
+					AnimationIndices { first: 0, last: 49 },
+					AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
+				));
+			})
+			.insert(Planet);
 	}
 }
 
 pub fn animate_planets(
-	mut planets_query: Query<
-		(
-			&mut TextureAtlasSprite,
-			&AnimationIndices,
-			&mut AnimationTimer,
-		),
-		With<Planet>,
-	>,
+	planets_query: Query<&Children, With<Planet>>,
+	mut planets_children_query: Query<(
+		&mut TextureAtlasSprite,
+		&AnimationIndices,
+		&mut AnimationTimer,
+	)>,
 	time: Res<Time>,
 ) {
-	for (mut sprite, indices, mut timer) in planets_query.iter_mut() {
-		Planet::animate(&mut sprite, indices, &mut timer, &time)
+	for children in planets_query.iter() {
+		for entity in children.iter() {
+			if let Ok(child_component) = planets_children_query.get_mut(*entity) {
+				let (mut sprite, indices, mut timer) = child_component;
+				Planet::animate(&mut sprite, &indices, &mut timer, &time);
+			}
+		}
 	}
 }
